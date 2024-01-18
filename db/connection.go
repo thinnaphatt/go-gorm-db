@@ -6,6 +6,7 @@ import (
 	"gorm.io/driver/mysql"
 )
 
+// ในภาษา Go ชื่อฟังก์ชันที่ขึ้นต้นด้วยตัวอักษรใหญ่จะเป็น public function
 func ConnectDatabase(dbType, dbUser, dbPassword, dbHost, dbPort, dbName string) (*gorm.DB, error) {
 	
 	var dialector gorm.Dialector
