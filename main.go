@@ -2,13 +2,16 @@
 package main
 
 import (
-	"log"			// ใช้สำหรับแสดงข้อความ error ออกทางหน้าจอ
-	"net/http"		// ใช้สำหรับสร้าง web server
-	"os"			// ใช้สำหรับอ่านค่า environment variable
-	"github.com/gin-gonic/gin"
+	"log"      // ใช้สำหรับแสดงข้อความ error ออกทางหน้าจอ
+	"net/http" // ใช้สำหรับสร้าง web server
+	"os"       // ใช้สำหรับอ่านค่า environment variable
+	"time"	   // time package ใช้สำหรับจัดการเกี่ยวกับเวลา
+
+	"github.com/anusornc/go-gorm-db/db"     // นำเข้า db
 	"github.com/anusornc/go-gorm-db/models" // นำเข้า models
-	"github.com/anusornc/go-gorm-db/db"		// นำเข้า db
-	"github.com/joho/godotenv"	// ใช้สำหรับอ่านค่าจากไฟล์ .env
+	"github.com/gin-contrib/cors"           // ใช้สำหรับกำหนด cors (Cross-Origin Resource Sharing)
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv" // ใช้สำหรับอ่านค่าจากไฟล์ .env
 )
 
 func main() {
@@ -42,6 +45,15 @@ func main() {
 	itemRepo := models.NewItemRepository(database)
 
 	r := gin.Default()
+	// กำหนด cors (Cross-Origin Resource Sharing)
+	r.Use(cors.New(cors.Config{
+		// 3000 คือ port ที่ใช้งานใน frontend react
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	// api /items จะเป็นการเรียกใช้งานฟังก์ชัน GetItems ใน ItemRepository
 	r.GET("/items", itemRepo.GetItems)

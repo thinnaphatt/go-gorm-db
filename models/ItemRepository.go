@@ -4,6 +4,7 @@ package models
 import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"fmt"
 )
 
 // สร้าง struct ชื่อ ItemRepository ที่มีฟิลด์ชื่อ Db เป็น pointer ของ gorm.DB
@@ -42,6 +43,8 @@ func (r *ItemRepository) PostItem(c *gin.Context) {
 func (r *ItemRepository) GetItem(c *gin.Context) {
 	id := c.Param("id")		// รับค่า id จากผู้ใช้งาน
 	var item Item			// สร้างตัวแปร item เพื่อเก็บข้อมูลที่ค้นหาได้
+	// print id ออกมาดู
+	fmt.Println(id)	
 	r.Db.First(&item, id)	// SELECT * FROM items WHERE id = id
 	c.JSON(200, item)		// ส่งข้อมูลกลับไปให้ผู้ใช้งาน
 }
