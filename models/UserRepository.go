@@ -135,5 +135,5 @@ func CheckPasswordHash(password, hash string) bool {
 	if err != nil {
 		fmt.Println("Password does not match")
 	}
-	return err == nil
+	return err == nil	// ส่งค่ากลับเป็น boolean ว่ารหัสผ่านตรงกันหรือไม่ (true หรือ false) โดยใช้เงื่อนไข err == nil ในการตรวจสอบ ถ้า err เป็น nil คือรหัสผ่านตรงกัน และส่งค่ากลับเป็น true ถ้าไม่ตรงกัน ส่งค่ากลับเป็น false
 }
