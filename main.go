@@ -36,7 +36,7 @@ func main() {
 	}
 
 	// สร้างตารางในฐานข้อมูล
-	err = database.AutoMigrate(&models.Item{})
+	err = database.AutoMigrate(&models.Item{}, &models.User{})
 	if err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
@@ -70,6 +70,28 @@ func main() {
 
 	// api /items/:id จะเป็นการเรียกใช้งานฟังก์ชัน DeleteItem ใน ItemRepository
 	r.DELETE("/items/:id", itemRepo.DeleteItem)
+
+	// สร้างตัวแปร userRepo เพื่อเรียกใช้งาน UserRepository
+	userRepo := models.NewUserRepository(database)
+
+	// api /users จะเป็นการเรียกใช้งานฟังก์ชัน GetUsers ใน UserRepository
+	r.GET("/users", userRepo.GetUsers)
+
+	// api /users จะเป็นการเรียกใช้งานฟังก์ชัน PostUser ใน UserRepository
+	r.POST("/users", userRepo.PostUser)
+
+	// api /users/:email จะเป็นการเรียกใช้งานฟังก์ชัน GetUser ใน UserRepository
+	// /users/abc@example จะเป็นการส่งค่า email ที่เป็นตัวอักษร abc@example ไปยังฟังก์ชัน GetUser ใน UserRepository
+	r.GET("/users/:email", userRepo.GetUser)
+
+	// api /users/:email จะเป็นการเรียกใช้งานฟังก์ชัน UpdateUser ใน UserRepository
+	r.PUT("/users/:email", userRepo.UpdateUser)
+
+	// api /users/:email จะเป็นการเรียกใช้งานฟังก์ชัน DeleteUser ใน UserRepository
+	r.DELETE("/users/:email", userRepo.DeleteUser)
+
+	// api /users/login จะเป็นการเรียกใช้งานฟังก์ชัน Login ใน UserRepository
+	r.POST("/users/login", userRepo.Login)
 
 	// ถ้าไม่มี api ที่ตรงกับที่กำหนด จะแสดงข้อความ Not found
 	r.NoRoute(func(c *gin.Context) {
