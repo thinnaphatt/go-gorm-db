@@ -121,7 +121,7 @@ func (r *UserRepository) Login(c *gin.Context) {
 		c.JSON(401, gin.H{"message": "Invalid email or password"})
 		return
 	}
-	c.JSON(200, gin.H{"message": "Login Success"})
+	c.JSON(200, gin.H{"message": "success"})
 }
 
 // ฟังก์ชันสำหรับเข้ารหัสรหัสผ่าน
