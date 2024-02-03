@@ -6,16 +6,14 @@ import (
 	"gorm.io/driver/mysql"
 )
 
-// ในภาษา Go ชื่อฟังก์ชันที่ขึ้นต้นด้วยตัวอักษรใหญ่จะเป็น public function
 func ConnectDatabase(dbType, dbUser, dbPassword, dbHost, dbPort, dbName string) (*gorm.DB, error) {
 	
 	var dialector gorm.Dialector
-
-	// ตรวจสอบว่าเป็นฐานข้อมูลชนิดใด
 	switch dbType {
 	case "mysql":
 // dsn := "admin:adminpassword@tcp(localhost:3306)/go_gorm?charset=utf8mb4&parseTime=True&loc=Local"
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, dbName)
+		fmt.Println("dsn:", dsn)
 		dialector = mysql.Open(dsn)
 	case "postgres":
 	case "sqlite":
