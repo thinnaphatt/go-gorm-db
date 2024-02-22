@@ -2,16 +2,16 @@
 package main
 
 import (
-	"log"      // ใช้สำหรับแสดงข้อความ error ออกทางหน้าจอ
-	"net/http" // ใช้สำหรับสร้าง web server
-	"os"       // ใช้สำหรับอ่านค่า environment variable
-	"time"     // time package ใช้สำหรับจัดการเกี่ยวกับเวลา
+	"log"
+	"net/http"
+	"os"
+	"time"
 
-	"github.com/anusornc/go-gorm-db/db"     // นำเข้า db
-	"github.com/anusornc/go-gorm-db/models" // นำเข้า models
-	"github.com/gin-contrib/cors"           // ใช้สำหรับกำหนด cors (Cross-Origin Resource Sharing)
+	"github.com/Nighter010/go-gorm-db/db"
+	"github.com/Nighter010/go-gorm-db/models"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv" // ใช้สำหรับอ่านค่าจากไฟล์ .env
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -36,7 +36,7 @@ func main() {
 	}
 
 	// AutoMigrate the database
-	err = database.AutoMigrate(&models.Item{}, &models.Student{}, &models.Subject{}, &models.User{})
+	err = database.AutoMigrate(&models.Item{}, &models.Student{}, &models.Subject{}, &models.Teacher{}, models.User{})
 	if err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
@@ -44,12 +44,13 @@ func main() {
 	// Create repositories for each model
 	itemRepo := models.NewItemRepository(database)
 	studentRepo := models.NewStudentRepository(database)
+	teacherRepo := models.NewTeacherRepository(database)
 	subjectRepo := models.NewSubjectRepository(database)
 
 	// Initialize Gin router
-
 	r := gin.Default()
 
+	// กำหนด cors (Cross-Origin Resource Sharing)
 	r.Use(cors.New(cors.Config{
 		// 3000 คือ port ที่ใช้งานใน frontend react
 		AllowOrigins:     []string{"http://localhost:5173"},
@@ -73,6 +74,13 @@ func main() {
 	r.PUT("/students/:id", studentRepo.UpdateStudent)
 	r.DELETE("/students/:id", studentRepo.DeleteStudent)
 
+	// Teacher routes
+	r.GET("/teachers", teacherRepo.GetTeachers)
+	r.POST("/teachers", teacherRepo.CreateTeacher)
+	r.GET("/teachers/:id", teacherRepo.GetTeacher)
+	r.PUT("/teachers/:id", teacherRepo.UpdateTeacher)
+	r.DELETE("/teachers/:id", teacherRepo.DeleteTeacher)
+
 	// Subject routes
 	r.GET("/subjects", subjectRepo.GetSubjects)
 	r.POST("/subjects", subjectRepo.CreateSubject)
@@ -80,6 +88,12 @@ func main() {
 	r.PUT("/subjects/:id", subjectRepo.UpdateSubject)
 	r.DELETE("/subjects/:id", subjectRepo.DeleteSubject)
 
+	// 404 route
+	r.NoRoute(func(c *gin.Context) {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Not found"})
+	})
+
+	// api /users/login จะเป็นการเรียกใช้งานฟังก์ชัน Login ใน UserRepository
 	// สร้างตัวแปร userRepo เพื่อเรียกใช้งาน UserRepository
 	userRepo := models.NewUserRepository(database)
 
@@ -101,11 +115,6 @@ func main() {
 
 	// api /users/login จะเป็นการเรียกใช้งานฟังก์ชัน Login ใน UserRepository
 	r.POST("/users/login", userRepo.Login)
-
-	// 404 route
-	r.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{"message": "Not found"})
-	})
 
 	// Run the server
 	if err := r.Run(":5000"); err != nil {

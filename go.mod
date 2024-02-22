@@ -1,6 +1,6 @@
-module github.com/anusornc/go-gorm-db
+module github.com/Nighter010/go-gorm-db
 
-go 1.20
+go 1.21.4
 
 require (
 	github.com/gin-contrib/cors v1.5.0
